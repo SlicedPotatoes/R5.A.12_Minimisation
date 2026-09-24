@@ -146,7 +146,7 @@ class NelderMead:
             else:
                 self.points[-1] = xr
 
-            self.__save_state(curr_step, "Reflexion", best_point=self.points[0], worse_point=worse_point,
+            self.__save_state(curr_step, "Expension", best_point=self.points[0], worse_point=worse_point,
                               gravity_point=x0, reflexion_point=xr, expansion_point=xe)
             return
 
@@ -160,7 +160,7 @@ class NelderMead:
 
             if xc_value < worse_value:
                 self.points[-1] = xc
-                self.__save_state(curr_step, "contraction", best_point=self.points[0],
+                self.__save_state(curr_step, "Contraction", best_point=self.points[0],
                                   gravity_point=x0, reflexion_point=xr, contraction_point=xc)
                 return
 
@@ -168,7 +168,7 @@ class NelderMead:
         for i in range(len(self.points)):
             self.points[i] = self.points[0] + (self.points[i] - self.points[0]).multiply_with_scalar(self.scalaire_homothetie)
 
-        self.__save_state(curr_step, "homothetie")
+        self.__save_state(curr_step, "Homothetie")
 
     def compute(self, total_step:int)->None:
         """

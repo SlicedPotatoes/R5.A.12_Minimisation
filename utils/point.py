@@ -3,7 +3,7 @@ class Point:
         self.values = values
         self.dimension = len(self.values)
 
-    def __operation(self, other:Point, f)->Point:
+    def __operation(self, other, f):
         if self.dimension != other.dimension:
             raise ValueError("Impossible d'effectuer l'opération sur deux points de dimension différent")
 
@@ -14,10 +14,10 @@ class Point:
 
         return Point(new_values)
 
-    def __add__(self, other:Point)->Point:
+    def __add__(self, other):
         return self.__operation(other, lambda a, b: a+b)
 
-    def __sub__(self, other:Point)->Point:
+    def __sub__(self, other):
         return self.__operation(other, lambda a, b: a-b)
 
     def __getitem__(self, index:int)->float:
@@ -29,7 +29,7 @@ class Point:
     def __repr__(self):
         return "Point(" + str(self.values) + ", Dimension: " + str(self.dimension) + ")"
 
-    def multiply_with_scalar(self, scalar:float)->Point:
+    def multiply_with_scalar(self, scalar:float):
         new_values = []
 
         for i in range(self.dimension):
