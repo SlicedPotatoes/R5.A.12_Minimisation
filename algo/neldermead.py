@@ -146,7 +146,7 @@ class NelderMead:
             else:
                 self.points[-1] = xr
 
-            self.__save_state(curr_step, "Expension", best_point=self.points[0], worse_point=worse_point,
+            self.__save_state(curr_step, "Expansion", best_point=self.points[0], worse_point=worse_point,
                               gravity_point=x0, reflexion_point=xr, expansion_point=xe)
             return
 
