@@ -102,6 +102,16 @@ class NelderMead:
             "contraction_point": contraction_point
         })
 
+    def __homothetie(self, curr_step)->None:
+        """
+        Homothétie de rapport scalaire_homothetie et de centre x1
+        """
+        for i in range(len(self.points)):
+            self.points[i] = self.points[0] + (self.points[i] - self.points[0]).multiply_with_scalar(
+                self.scalaire_homothetie)
+
+        self.__save_state(curr_step, "Homothetie")
+
     def __step(self, curr_step)->None:
         """
         Effectue une itération de l'algorithme
@@ -150,8 +160,28 @@ class NelderMead:
                               gravity_point=x0, reflexion_point=xr, expansion_point=xe)
             return
 
-        if xr_value >= xn_value:
-            # Contraction du simplexe
+        if worse_value >= xr_value >= xn_value:
+            # Contraction du simplexe 1
+            xc = x0 + (xr - x0).multiply_with_scalar(self.scalaire_contraction)
+            xc_value = self.f(xc)
+
+            self.__save_state(curr_step, "calcul_contraction_1", best_point=self.points[0], worse_point=worse_point,
+                              gravity_point=x0, reflexion_point=xr, contraction_point=xc)
+
+            if xc_value < xr_value:
+                self.__save_state(curr_step, "Contraction", best_point=self.points[0],
+                                  gravity_point=x0, reflexion_point=xr, contraction_point=xc)
+
+                self.points[-1] = xc
+            else:
+                self.__save_state(curr_step, "Reflexion", best_point=self.points[0],
+                                  gravity_point=x0, reflexion_point=xr, contraction_point=xc)
+                self.points[-1] = xr
+                self.__homothetie(curr_step)
+            return
+
+        if xr_value > worse_value:
+            # Contraction du simplexe 2
             xc = x0 + (worse_point - x0).multiply_with_scalar(self.scalaire_contraction)
             xc_value = self.f(xc)
 
@@ -164,11 +194,7 @@ class NelderMead:
                                   gravity_point=x0, reflexion_point=xr, contraction_point=xc)
                 return
 
-        # Homothétie de rapport scalaire_homothetie et de centre x1
-        for i in range(len(self.points)):
-            self.points[i] = self.points[0] + (self.points[i] - self.points[0]).multiply_with_scalar(self.scalaire_homothetie)
-
-        self.__save_state(curr_step, "Homothetie")
+        self.__homothetie(curr_step)
 
     def compute(self, total_step:int)->None:
         """
