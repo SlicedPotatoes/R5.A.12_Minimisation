@@ -1,4 +1,4 @@
-from algo.gradientPasFixe import gradientPasFixe
+from algo.__gradientPasFixe import gradientPasFixe
 from algo.neldermead import NelderMead
 from utils.point import Point
 

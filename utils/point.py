@@ -1,3 +1,6 @@
+from math import sqrt
+
+
 class Point:
     def __init__(self, values:list[float]):
         self.values = values
@@ -36,3 +39,11 @@ class Point:
             new_values.append(scalar * self.values[i])
 
         return Point(new_values)
+
+    def norm(self):
+        result = 0
+
+        for x in range(self.dimension):
+            result += self[x] ** 2
+
+        return sqrt(result)

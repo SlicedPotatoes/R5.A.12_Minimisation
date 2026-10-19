@@ -1,39 +1,24 @@
-from typing import TypedDict
 from utils.point import Point
-import numpy as np
-import math
 
+def get_gradient(dp, point:Point):
+    result = []
 
-def gradientPasFixe(fonction, x0: Point, alpha: float, epsilon: float, nbitr: int):
-    #Etape 1
-    x = x0
-    h = 1e-5
-    for _ in range(nbitr):
-        #Approximation du gradient
-        grad_values = []
-        for j in range(x.dimension):
-            # Création de deux points très proches autour de la coordonnée j
-            val_plus = list(x.values)
-            val_moins = list(x.values)
+    for i in range(len(dp)):
+        result.append(dp[i](point))
 
-            val_plus[j] += h
-            val_moins[j] -= h
+    return Point(result)
 
-            #Calul de la dérivé partielle
-            df_dj = (fonction(Point(val_plus)) - fonction(Point(val_moins))) / (2 * h)
-            grad_values.append(df_dj)
+def algo(dp, initial_point:Point, alpha, epsilon, max_itr):
+    curr = initial_point
+    history = [initial_point]
 
-        grad = Point(grad_values)
+    for _ in range(max_itr):
+        gradient = get_gradient(dp, curr)
 
-        #Critère d'arrêt tolérance
-        norme_grad = math.sqrt(sum(g ** 2 for g in grad.values))
-        if norme_grad < epsilon:
-            return x
+        if gradient.norm() <= epsilon:
+            break
 
-        #Mise à jour du point x
-        grad_ajuste = grad.multiply_with_scalar(alpha)
-        x = x - grad_ajuste
-        
-    #Si le nombre d'iteration est attein
-    return x
+        curr = curr - gradient.multiply_with_scalar(alpha)
+        history.append(curr)
 
+    return curr, history

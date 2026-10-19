@@ -1,5 +1,6 @@
 from typing import TypedDict
 from utils.point import Point
+import time
 
 class State(TypedDict):
     """
@@ -20,6 +21,18 @@ class State(TypedDict):
     reflexion_point: Point | None
     expansion_point: Point | None
     contraction_point: Point | None
+
+def init_simplex(x, h=0.5):
+    points = [Point(list(x))]
+
+    for i in range(len(x)):
+        y = list(x)
+        y[i] += h
+        points.append(Point(y))
+
+    return points
+
+
 
 class NelderMead:
     """
@@ -64,7 +77,13 @@ class NelderMead:
         self.scalaire_contraction = scalaire_contraction
         self.scalaire_homothetie = scalaire_homothetie
 
-        self.history:list[State] = []
+        self.history:list[State] = [] # Historique pour l'animation
+
+        self.history_benchmark = {
+            "best_points": [],
+            "best_values": [],
+            "execution_time": []
+        }
 
     def __sort_points(self)->None:
         """
@@ -169,14 +188,16 @@ class NelderMead:
                               gravity_point=x0, reflexion_point=xr, contraction_point=xc)
 
             if xc_value < xr_value:
-                self.__save_state(curr_step, "Contraction", best_point=self.points[0],
-                                  gravity_point=x0, reflexion_point=xr, contraction_point=xc)
-
                 self.points[-1] = xc
+
+                self.__save_state(curr_step, "Contraction_1", best_point=self.points[0],
+                                  gravity_point=x0, reflexion_point=xr, contraction_point=xc)
             else:
+                self.points[-1] = xr
+
                 self.__save_state(curr_step, "Reflexion", best_point=self.points[0],
                                   gravity_point=x0, reflexion_point=xr, contraction_point=xc)
-                self.points[-1] = xr
+
                 self.__homothetie(curr_step)
             return
 
@@ -185,12 +206,12 @@ class NelderMead:
             xc = x0 + (worse_point - x0).multiply_with_scalar(self.scalaire_contraction)
             xc_value = self.f(xc)
 
-            self.__save_state(curr_step, "calcul_contraction", best_point=self.points[0], worse_point=worse_point,
+            self.__save_state(curr_step, "calcul_contraction_2", best_point=self.points[0], worse_point=worse_point,
                               gravity_point=x0, reflexion_point=xr, contraction_point=xc)
 
             if xc_value < worse_value:
                 self.points[-1] = xc
-                self.__save_state(curr_step, "Contraction", best_point=self.points[0],
+                self.__save_state(curr_step, "Contraction_2", best_point=self.points[0],
                                   gravity_point=x0, reflexion_point=xr, contraction_point=xc)
                 return
 
@@ -206,3 +227,16 @@ class NelderMead:
 
         for i in range(total_step):
             self.__step(i+1)
+
+            best_point = self.points[0]
+            best_value = self.f(self.points[0])
+
+            for p in self.points:
+                p_value = self.f(p)
+
+                if p_value < best_value:
+                    best_value = p_value
+                    best_point = p
+
+            self.history_benchmark["best_points"].append(best_point)
+            self.history_benchmark["best_values"].append(best_value)
