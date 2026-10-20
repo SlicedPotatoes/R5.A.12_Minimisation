@@ -1,6 +1,6 @@
+import time
 from typing import TypedDict
 from utils.point import Point
-import time
 
 class State(TypedDict):
     """
@@ -172,11 +172,16 @@ class NelderMead:
 
             if xe_value <= xr_value:
                 self.points[-1] = xe
+
+                self.__save_state(curr_step, "Expansion", best_point=self.points[0], worse_point=worse_point,
+                                  gravity_point=x0, reflexion_point=xr, expansion_point=xe)
             else:
                 self.points[-1] = xr
 
-            self.__save_state(curr_step, "Expansion", best_point=self.points[0], worse_point=worse_point,
-                              gravity_point=x0, reflexion_point=xr, expansion_point=xe)
+                self.__save_state(curr_step, "Reflexion", best_point=self.points[0], worse_point=worse_point,
+                                  gravity_point=x0, reflexion_point=xr, expansion_point=xe)
+
+
             return
 
         if worse_value >= xr_value >= xn_value:
@@ -226,7 +231,9 @@ class NelderMead:
         self.__save_state(0, "init")
 
         for i in range(total_step):
+            start = time.perf_counter_ns()
             self.__step(i+1)
+            end = time.perf_counter_ns()
 
             best_point = self.points[0]
             best_value = self.f(self.points[0])
@@ -240,3 +247,4 @@ class NelderMead:
 
             self.history_benchmark["best_points"].append(best_point)
             self.history_benchmark["best_values"].append(best_value)
+            self.history_benchmark["execution_time"].append(end - start)
